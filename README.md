@@ -8,6 +8,7 @@ Un Simple Tablon de Texto
     * TinyMCE
     * JQuery
     * Bootstrap
+    * Bootbox
     * Moment.js
     * js.cookie
     * jquery.validate
