@@ -11,7 +11,7 @@ using System.Web.Script.Serialization;
 /// </summary>
 [WebService(Namespace = "http://tempuri.org/")]
 [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
-// Para permitir que se llame a este servicio web desde un script, usando ASP.NET AJAX, quite la marca de comentario de la línea siguiente. 
+// Para permitir que se llame a este servicio web desde un script, usando ASP.NET AJAX, quite la marca de comentario de la línea siguiente.
 [System.Web.Script.Services.ScriptService]
 public class zoe : System.Web.Services.WebService
 {
@@ -19,8 +19,8 @@ public class zoe : System.Web.Services.WebService
     public zoe()
     {
 
-        //Elimine la marca de comentario de la línea siguiente si utiliza los componentes diseñados 
-        //InitializeComponent(); 
+        //Elimine la marca de comentario de la línea siguiente si utiliza los componentes diseñados
+        //InitializeComponent();
     }
 
     [WebMethod]
@@ -58,7 +58,7 @@ public class zoe : System.Web.Services.WebService
     [WebMethod]
     public List<Board> BoardLinks()
     {
-        string sql = "SELECT Name,url FROM boards ORDER BY name ASC";
+        string sql = "SELECT Name,url,Descripcion FROM boards ORDER BY name ASC";
         MySqlCommand cmd = new MySqlCommand(sql, conn);
         List<Board> lista = new List<Board>();
         conn.Open();
@@ -67,7 +67,8 @@ public class zoe : System.Web.Services.WebService
         {
             lista.Add(new Board(
                 dr.GetString(0),     // Name
-                dr.GetString(1)    // url
+                dr.GetString(1),    // url
+                dr.GetString(2)    //Descripcion
                 ));
         }
         conn.Close();

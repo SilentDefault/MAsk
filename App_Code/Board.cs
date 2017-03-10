@@ -19,10 +19,12 @@ public class Board
         this.Descripcion = v2;
     }
 
-    public Board(string v1, string v2)
+    public Board(string v1, string v2, string v3)
     {
         this.Name = v1;
         this.url = v2;
+        this.Descripcion = v3;
+
     }
 
     public int ID { get; set; }

@@ -1,5 +1,6 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
+
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -17,7 +18,7 @@
     <script src="Scripts/vue-resourse.js"></script>
     <script>
         moment.locale('es');
-        $(document).ready(function () {
+        $(document).ready(function() {
             if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
                 $('.tab-pane').css('padding', '1%');
             } else {
@@ -33,40 +34,63 @@
         }
     </style>
 </head>
+
 <body>
-    <nav class="navbar randomColor" style="background-color: rebeccapurple; margin-bottom: 0px; border-radius: 0px;">
-        <ol class="breadcrumb" style="white-space:nowrap;overflow-x:auto;" id="boarlinks">
+    <nav id="boarlinks" class="navbar randomColor" style="background-color: rebeccapurple; margin-bottom: 0px; border-radius: 0px;">
+        <ol class="breadcrumb" style="white-space:nowrap;overflow-x:auto;">
             <li><a href="..">Home</a></li>
             <li v-cloak v-for="link in links"><a :href="link.url">{{link.Name}}</a></li>
         </ol>
-        <script>
-            var boarlinks = new Vue({
-                el: '#boarlinks',
-                data: {
-                    links: []
-                },
-                methods: {
-                    cargarLinks() {
-                        this.$http.post('zoe.asmx/BoardLinks')
-                            .then(function(response) {
-                                this.links = response.body.d;
-                            })
-                    }
-                },
-                created: function() {
-                    this.cargarLinks();
-                }
-            })
-        </script>
-    </nav>
-    <div class="randomColor" style="background-color: rebeccapurple;text-align: center;">
-        <h1 style="margin-top: -1px;">
-            <label id="boardName">BoardName</label>
+        <div class="randomColor" style="background-color: rebeccapurple;text-align: center;">
+            <div v-if="path != 'home'">
+                <h1 style="margin-top: -1px;">
+            <label>{{path}}</label>
         </h1>
-        <label style="margin-bottom: -2px;">
-            BoardDesc
+                <label style="margin-bottom: -2px;">
+            {{des}}
         </label>
-    </div>
+            </div>
+            <div v-else>
+                <h1 style="margin-top: -1px;">
+            <label>MAsk</label><kbd>ß</kbd>
+            </h1>
+                <label>
+            The Massive Ask
+        </label>
+            </div>
+
+        </div>
+    </nav>
+    <script>
+        var path = window.location.pathname;
+
+        var boarlinks = new Vue({
+            el: '#boarlinks',
+            data: {
+                links: [],
+                path: path,
+                des: ''
+            },
+            methods: {
+                cargarLinks() {
+                    this.$http.post('zoe.asmx/BoardLinks')
+                        .then(function(response) {
+                            this.links = response.body.d;
+                            if (this.path.length != 1) {
+                                let tmp = response.body.d.filter(x => x.url == path.substring(1))[0];
+                                this.path = tmp.Name;
+                                this.des = tmp.Descripcion;
+                            } else {
+                                this.path = 'home'
+                            }
+                        })
+                }
+            },
+            created: function() {
+                this.cargarLinks();
+            }
+        })
+    </script>
     <!-- Nav tabs -->
     <ul class="nav nav-tabs" role="tablist" style="background-color:rebeccapurple;">
         <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Home</a></li>
@@ -104,7 +128,6 @@
                 </table>
             </div>
             <script>
-                var path = window.location.pathname;
                 var post = new Vue({
                     el: '#post',
                     data: {
@@ -121,7 +144,8 @@
                                 .catch(function(error) {
                                     // TODO : Falta por controlar
                                 })
-                        }
+                        },
+
                     },
                     created: function() {
                         this.Posts();
@@ -134,4 +158,5 @@
         <div role="tabpanel" class="tab-pane fade" id="settings">...</div>
     </div>
 </body>
+
 </html>
