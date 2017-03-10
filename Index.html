@@ -108,7 +108,7 @@
                             <td class="auto-style3">
                                 <div v-html="pst.User != '---' ? (pst.Mask != 'Anónimo' ? '<a>'+pst.User+'</a> ['+pst.Mask+']' : '<a>'+pst.User+'</a>') : pst.Mask"></div>
                             </td>
-                            <td class="auto-style3" style="text-align:right"><abbr :title="pst.Date"><div v-html="pst.Date"></div></abbr></td>
+                            <td class="auto-style3" style="text-align:right"><abbr :title="pst.Date">{{pst.Date | now}}</abbr></td>
                         </tr>
                         <tr>
                             <td class="hide"><img src="" alt="Alternate Text"><video controls="controls"><source src="n/a" type="video/mp4"><source src="n/a" type="video/webm"></video></td>
@@ -146,6 +146,14 @@
                                 })
                         },
 
+                    },
+                    filters: {
+                        fecha: (function(data) {
+                            return moment(data).format('LLLL');
+                        }),
+                        now: (function(data) {
+                            return moment(data).fromNow();
+                        })
                     },
                     created: function() {
                         this.Posts();
