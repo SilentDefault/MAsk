@@ -1,11 +1,12 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title></title>
-    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" charset="utf-8" lang="es" translate="no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="rebeccapurple">
+    <title>[MAsk]</title>
     <link href="Content/bootstrap.min.css" rel="stylesheet" />
     <script src="Scripts/jquery-3.1.1.min.js"></script>
     <script src="Scripts/bootstrap.min.js"></script>
@@ -16,9 +17,11 @@
     <script src="Scripts/tinymce/tinymce.min.js"></script>
     <script src="Scripts/vue.js"></script>
     <script src="Scripts/vue-resourse.js"></script>
+    <link href="Content/comun.css" rel="stylesheet" />
+    <script src="Scripts/comentar.js"></script>
     <script>
         moment.locale('es');
-        $(document).ready(function() {
+        $(document).ready(function () {
             if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
                 $('.tab-pane').css('padding', '1%');
             } else {
@@ -39,24 +42,24 @@
     <nav id="boarlinks" class="navbar randomColor" style="background-color: rebeccapurple; margin-bottom: 0px; border-radius: 0px;">
         <ol class="breadcrumb" style="white-space:nowrap;overflow-x:auto;">
             <li><a href="..">Home</a></li>
-            <li v-cloak v-for="link in links"><a :href="link.url">{{link.Name}}</a></li>
+            <li v-cloak v-for="link in links"><a href="link.url">{{link.Name}}</a></li>
         </ol>
         <div class="randomColor" style="background-color: rebeccapurple;text-align: center;">
             <div v-if="path != 'home'">
                 <h1 style="margin-top: -1px;">
-            <label>{{path}}</label>
-        </h1>
+                    <label>{{path}}</label>
+                </h1>
                 <label style="margin-bottom: -2px;">
-            {{des}}
-        </label>
+                    {{des}}
+                </label>
             </div>
             <div v-else>
                 <h1 style="margin-top: -1px;">
-            <label>MAsk</label><kbd>ß</kbd>
-            </h1>
+                    <label>MAsk</label><kbd>ß</kbd>
+                </h1>
                 <label>
-            The Massive Ask
-        </label>
+                    The Massive Ask
+                </label>
             </div>
 
         </div>
@@ -69,34 +72,37 @@
             data: {
                 links: [],
                 path: path,
-                des: ''
+                des: '',
+                color: ''
             },
             methods: {
                 cargarLinks() {
                     this.$http.post('zoe.asmx/BoardLinks')
-                        .then(function(response) {
+                        .then(function (response) {
                             this.links = response.body.d;
                             if (this.path.length != 1) {
                                 let tmp = response.body.d.filter(x => x.url == path.substring(1))[0];
                                 this.path = tmp.Name;
                                 this.des = tmp.Descripcion;
+                                this.color = tmp.Color;
                             } else {
                                 this.path = 'home'
                             }
                         })
                 }
             },
-            created: function() {
+            created: function () {
                 this.cargarLinks();
             }
         })
     </script>
     <!-- Nav tabs -->
     <ul class="nav nav-tabs" role="tablist" style="background-color:rebeccapurple;">
+        <li role="presentation"><a href="#FAQ" aria-controls="FQA" role="tab" data-toggle="tab">FAQ</a></li>
         <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Home</a></li>
-        <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">Profile</a></li>
-        <li role="presentation"><a href="#messages" aria-controls="messages" role="tab" data-toggle="tab">Messages</a></li>
-        <li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">Settings</a></li>
+        <li role="presentation"><a href="#rules" aria-controls="rules" role="tab" data-toggle="tab">Reglas</a></li>
+        <li role="presentation" style="margin-right: 0px;" class="navbar-right"><a href="#registrar" aria-controls="registrar" role="tab" data-toggle="tab">Registrar</a></li>
+        <li role="presentation" class="navbar-right"><a href="#entrar" aria-controls="entrar" role="tab" data-toggle="tab">Entrar</a></li>
     </ul>
     <!-- Tab panes -->
     <div class="tab-content">
@@ -108,7 +114,7 @@
                             <td class="auto-style3">
                                 <div v-html="pst.User != '---' ? (pst.Mask != 'Anónimo' ? '<a>'+pst.User+'</a> ['+pst.Mask+']' : '<a>'+pst.User+'</a>') : pst.Mask"></div>
                             </td>
-                            <td class="auto-style3" style="text-align:right"><abbr :title="pst.Date">{{pst.Date | now}}</abbr></td>
+                            <td class="auto-style3" style="text-align:right"><abbr title="pst.Date">{{pst.Date | now}}</abbr><div v-if="b=='/'"> en <label><a href="pst.BoardLink">{{pst.BoardName}}</a></label></div></td>
                         </tr>
                         <tr>
                             <td class="hide"><img src="" alt="Alternate Text"><video controls="controls"><source src="n/a" type="video/mp4"><source src="n/a" type="video/webm"></video></td>
@@ -121,8 +127,8 @@
                             </td>
                         </tr>
                         <tr>
-                            <td class="auto-style3" :id="'estado'+pst.ID">Aplausos:{{pst.Aplausos}} Piedra:{{pst.Piedra}} Papel:{{ pst.Papel}}Tijeras:{{pst.Tijeras}}</td>
-                            <td style="text-align:right"><a :href="'javascript:commentar('+pst.ID+');'">Comentarios: <label id="'commentNumber'+pst.ID">{{pst.Comments}}</label></a></td>
+                            <td class="auto-style3" id="'estado'+pst.ID">Aplausos:{{pst.Aplausos}} Piedra:{{pst.Piedra}} Papel:{{ pst.Papel}}Tijeras:{{pst.Tijeras}}</td>
+                            <td style="text-align:right"><a style="cursor: pointer;" onclick="'comentar('+pst.ID+');'">Comentarios: <label id="'commentNumber'+pst.ID">{{pst.Comments}}</label></a></td>
                         </tr>
                     </tbody>
                 </table>
@@ -131,39 +137,67 @@
                 var post = new Vue({
                     el: '#post',
                     data: {
+                        b: path,
                         posts: []
                     },
                     methods: {
                         Posts() {
-                            this.$http.post('zoe.asmx/Posts', {
-                                    board: path.length != 1 ? path.substring(1) : 'dev'
-                                })
-                                .then(function(response) {
+                            this.$http.post(path.length == 1 ? 'zoe.asmx/Last' : 'zoe.asmx/Posts', {
+                                board: path.length == 1 ? 0 : 'dev'
+                            })
+                                .then(function (response) {
                                     this.posts = response.body.d;
                                 })
-                                .catch(function(error) {
+                                .catch(function (error) {
                                     // TODO : Falta por controlar
                                 })
                         },
-
                     },
                     filters: {
-                        fecha: (function(data) {
-                            return moment(data).format('LLLL');
-                        }),
-                        now: (function(data) {
+                        now: (function (data) {
                             return moment(data).fromNow();
                         })
                     },
-                    created: function() {
+                    created: function () {
                         this.Posts();
                     }
                 })
             </script>
         </div>
-        <div role="tabpanel" class="tab-pane fade" id="profile">...</div>
-        <div role="tabpanel" class="tab-pane fade" id="messages">...</div>
-        <div role="tabpanel" class="tab-pane fade" id="settings">...</div>
+        <div role="tabpanel" class="tab-pane fade" id="FAQ">
+            <dl>
+                <dt>¿Qué es MAsk?</dt>
+                <dd>Un (no)sencillo tablón de texto. Donde cada tablon es dedicado a un tema en especifico.</dd>
+                <dt>¿Qué se hace aquí?</dt>
+                <dd>En escencia escibir y leer; escribes lo que piensas sobre un cierto tema, y leer lo que la gente piensa sobre ese mismo tema.</dd>
+                <dt>¿Cómo puedo ayudar?</dt>
+                <dd>
+                    <ul>
+                        <li>Comparte la página, mientras más gente juegue es mas divertido.</li>
+                        <li>En el Tablon <a href="dev">/dev/</a> Comenta bugs que encuentres y/o funciones que pueden servir para MAsk (empezando con funciones fáciles).</li>
+                    </ul>
+                </dd>
+                <dt>¿No existe una App?</dt>
+                <dd>Por ahora que es una Beta no creo que sea necesario, pero puedes crear un acceso directo.</dd>
+                <dd>
+                    <ul>
+                        <li>En Android(Chrome): Opciones>Añadir a pantalla de inicio. (Recomendado)</li>
+                        <li>En Windows(Chrome): Arrastra el icono que esta antes de dirección de la pagina hasta el escritorio.</li>
+                    </ul>
+                </dd>
+            </dl>
+        </div>
+        <div role="tabpanel" class="tab-pane fade" id="rules">
+            <ol>
+                <li>Respetar el tema del Post</li>
+            </ol>
+        </div>
+        <div role="tabpanel" class="tab-pane fade" id="entrar">
+            ...
+        </div>
+        <div role="tabpanel" class="tab-pane fade" id="registrar">
+            ...
+        </div>
     </div>
 </body>
 

@@ -58,7 +58,7 @@ public class zoe : System.Web.Services.WebService
     [WebMethod]
     public List<Board> BoardLinks()
     {
-        string sql = "SELECT Name,url,Descripcion FROM boards ORDER BY name ASC";
+        string sql = "SELECT Name,url,Descripcion,Color FROM boards ORDER BY name ASC";
         MySqlCommand cmd = new MySqlCommand(sql, conn);
         List<Board> lista = new List<Board>();
         conn.Open();
@@ -66,13 +66,42 @@ public class zoe : System.Web.Services.WebService
         while (dr.Read())
         {
             lista.Add(new Board(
-                dr.GetString(0),     // Name
+                dr.GetString(0),    // Name
                 dr.GetString(1),    // url
-                dr.GetString(2)    //Descripcion
+                dr.GetString(2),    //Descripcion
+                dr.GetString(3)     //color
                 ));
         }
         conn.Close();
         return lista;
     }
 
+    [WebMethod]
+    public List<Post> Last(int board)
+    {
+        List<Post> lista = new List<Post>();
+        MySqlCommand cmd = new MySqlCommand("CALL Last('" + board + "');", conn);
+        conn.Open();
+        MySqlDataReader dr = cmd.ExecuteReader();
+        while (dr.Read())
+        {
+            lista.Add(new Post(
+                dr.GetInt32(0),     // ID
+                dr.GetString(1),    //Conetent
+                dr.GetString(2),    // urlMedia
+                dr.GetInt32(3),    //commentarios
+                dr.GetString(4),    //fecha
+                dr.GetString(5),    //user
+                dr.GetString(6), //mask
+                dr.GetInt32(7), //aplausos
+                dr.GetInt32(8), //piedra
+                dr.GetInt32(9), //papel
+                dr.GetInt32(10), //tijeras
+                dr.GetString(11),     //BoardName
+                dr.GetString(12)      //BoardLink
+                ));
+        }
+        conn.Close();
+        return lista;
+    }
 }

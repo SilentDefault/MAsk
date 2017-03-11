@@ -19,17 +19,17 @@ public class Board
         this.Descripcion = v2;
     }
 
-    public Board(string v1, string v2, string v3)
+    public Board(string v1, string v2, string v3, string v4)
     {
         this.Name = v1;
         this.url = v2;
         this.Descripcion = v3;
-
+        this.Color = v4;
     }
 
     public int ID { get; set; }
     public string Name { get; set; }
     public string Descripcion { get; set; }
-
     public string url { get; set; }
+    public string Color { get; set; }
 }

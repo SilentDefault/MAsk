@@ -49,7 +49,6 @@ public class Post
     public string Date { get; set; }
     public string Mask { get; set; }
     public string User { get; set; }
-    public int Board { get; set; }
     public string BoardName { get; set; }
     public string BoardLink { get; set; }
     public int Aplausos { get; set; }

@@ -1,0 +1,32 @@
+﻿.auto-style2 {
+    width: 100%;
+    height: 106px;
+    margin-bottom: 10px;
+}
+
+.auto-style3 {
+    width: 70%;
+    height: 30px;
+}
+
+.auto-style4 {
+    height: 30px;
+    width: 605px;
+}
+
+.auto-style5 {
+    width: 605px;
+}
+
+#sticky.stick {
+    margin-top: 0 !important;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1;
+    border-radius: 0 0 0.5em 0.5em;
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
