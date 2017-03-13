@@ -21,15 +21,15 @@
     <script src="Scripts/comentar.js"></script>
     <script>
         moment.locale('es');
-        $(document).ready(function () {
-            if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-                $('.tab-pane').css('padding', '1%');
-            } else {
-                $('.tab-pane').css('padding-top', '1%');
-                $('.tab-pane').css('padding-left', '20%');
-                $('.tab-pane').css('padding-right', '20%');
-            }
-        });
+        //$(document).ready(function () {
+        //    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        //        $('.tab-pane').css('padding', '1%');
+        //    } else {
+        //        $('.tab-pane').css('padding-top', '1%');
+        //        $('.tab-pane').css('padding-left', '20%');
+        //        $('.tab-pane').css('padding-right', '20%');
+        //    }
+        //});
     </script>
     <style>
         [v-cloak] {
@@ -42,7 +42,7 @@
     <nav id="boarlinks" class="navbar randomColor" style="background-color: rebeccapurple; margin-bottom: 0px; border-radius: 0px;">
         <ol class="breadcrumb" style="white-space:nowrap;overflow-x:auto;">
             <li><a href="..">Home</a></li>
-            <li v-cloak v-for="link in links"><a href="link.url">{{link.Name}}</a></li>
+            <li v-cloak v-for="link in links"><a :href="link.url">{{link.Name}}</a></li>
         </ol>
         <div class="randomColor" style="background-color: rebeccapurple;text-align: center;">
             <div v-if="path != 'home'">
@@ -55,7 +55,7 @@
             </div>
             <div v-else>
                 <h1 style="margin-top: -1px;">
-                    <label>MAsk</label><kbd>ß</kbd>
+                    <label>MAsk</label><kbd data-toggle="modal" data-target=".versionModal">ß</kbd>
                 </h1>
                 <label>
                     The Massive Ask
@@ -107,7 +107,7 @@
     <!-- Tab panes -->
     <div class="tab-content">
         <div role="tabpanel" class="tab-pane fade in active" id="home">
-            <div id="post">
+            <div id="post" class="col-sm-offset-2 col-sm-8">
                 <table v-cloak v-for="pst in posts" class="auto-style2" style="border-bottom: 1px solid #ccd6dd;width: 100%">
                     <tbody>
                         <tr>
@@ -122,13 +122,15 @@
                         <tr>
                             <td colspan="2">
                                 <p style="text-align: center;">
-                                    <div v-html="pst.Content"></div>
+                                    <blockquote>
+                                        <div v-html="pst.Content"></div>
+                                    </blockquote>
                                 </p>
                             </td>
                         </tr>
                         <tr>
-                            <td class="auto-style3" id="'estado'+pst.ID">Aplausos:{{pst.Aplausos}} Piedra:{{pst.Piedra}} Papel:{{ pst.Papel}}Tijeras:{{pst.Tijeras}}</td>
-                            <td style="text-align:right"><a style="cursor: pointer;" onclick="'comentar('+pst.ID+');'">Comentarios: <label id="'commentNumber'+pst.ID">{{pst.Comments}}</label></a></td>
+                            <td class="auto-style3" :id="'estado'+pst.ID">Aplausos:{{pst.Aplausos}} Piedra:{{pst.Piedra}} Papel:{{ pst.Papel}}Tijeras:{{pst.Tijeras}}</td>
+                            <td style="text-align:right"><a style="cursor: pointer;" :onclick="'comentar('+pst.ID+');'">Comentarios: <label id="'commentNumber'+pst.ID">{{pst.Comments}}</label></a></td>
                         </tr>
                     </tbody>
                 </table>
@@ -202,6 +204,75 @@
             ...
         </div>
     </div>
+    <div class="modal fade versionModal" tabindex="-1" role="dialog" aria-labelledby="gridSystemModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="gridSystemModalLabel">MAsk β Version 0.1.4</h4>
+                </div>
+                <div class="modal-body">
+                    <dl>
+                        <dt>0.1.4</dt>
+                        <dd>???</dd>
+                        <dt>0.1.3</dt>
+                        <dd>Cambios Internos de Servidor y Base de Datos, no afecta a los Usuarios.</dd>
+                        <dt>0.1.2</dt>
+                        <dd>Correciones Menores.</dd>
+                        <dt>0.1.1</dt>
+                        <dd>Correciones Menores.</dd>
+                        <dt>0.1.0</dt>
+                        <dd>Comienzo de Beta Abierta.</dd>
+                    </dl>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div>
+    <div class="modal fade commentModal" tabindex="-1" role="dialog" aria-labelledby="gridSystemModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="postStatus"></h4>
+                </div>
+                <div class="modal-body" style="max-height:80vh;overflow-y:auto" id="comments">
+                </div>
+                <div class="modal-footer" id="posting">
+                    <textarea id="Contenidoo"></textarea>
+                    <br />
+                    <div class="row" id="crearCliente">
+                        <div class="col-xs-9 col-md-10">
+                            <select id="SelectMaskCo" class="form-control">
+                                <option value="0">selecciona Mask</option>
+                            </select>
+                            <!--<script>
+                                $.ajax({
+                                    type: "POST",
+                                    url: '/Home/Mask/',
+                                    data: "{ 'userId':'" + Cookies.get('ID') + "'}",
+                                    content: "json",
+                                    contentType: "application/json",
+                                    error: function (xhr) {
+                                        bootbox.alert('Ha ocurrido algun tipo de error');
+                                    },
+                                    success: function (data) {
+                                        $.each(data, function (key, value) {
+                                            $('<option value="' + value.ID + '">' + value.Name + '</option>').appendTo('#SelectMaskCo');
+                                        });
+                                    }
+                                });
+                            </script>-->
+                        </div>
+                        <div class="col-xs-2 col-md-2">
+                            <button id="comentar" type="button" class="btn btn-default">Post!</button>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div>
 </body>
-
 </html>

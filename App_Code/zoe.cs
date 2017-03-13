@@ -104,4 +104,27 @@ public class zoe : System.Web.Services.WebService
         conn.Close();
         return lista;
     }
+
+    [WebMethod]
+    public List<Comment> Comments(string post)
+    {
+        string sql = " CALL CommentsByPost(" + post + ");";
+        MySqlCommand cmd = new MySqlCommand(sql, conn);
+        List<Comment> lista = new List<Comment>();
+        conn.Open();
+        MySqlDataReader dr = cmd.ExecuteReader();
+        while (dr.Read())
+        {
+            lista.Add(new Comment(
+                dr.GetInt32(0),     // ID
+                dr.GetString(1),    // urlMedia
+                dr.GetString(2),    //Conetent
+                dr.GetString(3),    //Date
+                dr.GetString(5),    //Mask
+                dr.GetString(4)    //User
+                ));
+        }
+        conn.Close();
+        return lista;
+    }
 }
