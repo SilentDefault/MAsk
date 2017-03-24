@@ -2,32 +2,46 @@
 <html>
 
 <head>
+    <meta charset="utf-8" lang="es" translate="no" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" charset="utf-8" lang="es" translate="no" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="rebeccapurple">
+    <link rel="icon" href="Content/icon.png" type="image/png">
+    <link rel="apple-touch-icon" href="Content/icon.png">
+    <meta name="theme-color">
     <title>[MAsk]</title>
+    <meta name="mobile-web-app-capable" content="yes">
     <link href="Content/normalize.css" rel="stylesheet" />
+    <link rel="stylesheet/less" type="text/css" href="Content/Undo.less" />
+    <script src="Scripts/less.min.js"></script>
     <link href="Content/comun.css" rel="stylesheet" />
     <script src="Scripts/jquery-3.1.1.min.js"></script>
     <script src="Scripts/moment-with-locales.min.js"></script>
-    <script src="Scripts/jquery.validate.min.js"></script>
-    <script src="Scripts/js-cookie/js.cookie-2.1.3.min.js"></script>
-    <script src="Scripts/tinymce/tinymce.min.js"></script>
     <script src="Scripts/vue.js"></script>
     <script src="Scripts/vue-resourse.js"></script>
     <script src="Scripts/comentar.js"></script>
+    <script src="Scripts/undo.js"></script>
     <script>
         moment.locale('es');
-        //$(document).ready(function () {
-        //    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-        //        $('.tab-pane').css('padding', '1%');
-        //    } else {
-        //        $('.tab-pane').css('padding-top', '1%');
-        //        $('.tab-pane').css('padding-left', '20%');
-        //        $('.tab-pane').css('padding-right', '20%');
-        //    }
-        //});
+        $(document).ready(function () {
+            $(function () {
+                $(window).scroll(sticky_relocate);
+            });
+            function sticky_relocate() {
+                var window_top = $(window).scrollTop();
+                var div_top = $('#sticky-anchor').offset().top;
+                if (window_top > div_top) {
+                    $('#sticky').addClass('stick');
+                    $('#sticky-anchor').height($('#sticky').outerHeight());
+                } else {
+                    $('#sticky').removeClass('stick');
+                    $('#sticky-anchor').height(0);
+                }
+            }
+            $('[data-target="#home"]').on('click', function () {
+                $('html,body').animate({ scrollTop: $("#header").offset().top }, 'slow');
+            });
+        });
     </script>
     <style>
         [v-cloak] {
@@ -37,36 +51,49 @@
 </head>
 
 <body>
-    <nav id="boarlinks" class="navbar randomColor" style="background-color: rebeccapurple; margin-bottom: 0px; border-radius: 0px;">
-        <ol class="breadcrumb" style="white-space:nowrap;overflow-x:auto;">
-            <li><a href="..">Home</a></li>
-            <li v-cloak v-for="link in links"><a :href="link.url">{{link.Name}}</a></li>
-        </ol>
-        <div class="randomColor" style="background-color: rebeccapurple;text-align: center;">
-            <div v-if="path != 'home'">
-                <h1 style="margin-top: -1px;">
-                    <label>{{path}}</label>
-                </h1>
-                <label style="margin-bottom: -2px;">
-                    {{des}}
-                </label>
-            </div>
-            <div v-else>
-                <h1 style="margin-top: -1px;">
-                    <label>MAsk</label><kbd data-toggle="modal" data-target=".versionModal">ß</kbd>
-                </h1>
-                <label>
-                    The Massive Ask
-                </label>
-            </div>
+    <!-- Header -->
+    <div id="header" :style="'background-color: '+color+';'">
+        <nav style="margin-bottom: 0px; border-radius: 0px;">
+            <ol class="breadcrumb" style="white-space:nowrap;overflow-x:auto;">
+                <li><a href=".." style="color:black">Home</a></li>
+                <li v-cloak v-for="link in links" class="redpo"><a :href="link.url" :style="'color: #'+link.Color+';'">{{link.Name}}</a></li>
+            </ol>
+            <div style="text-align: center;">
+                <div v-if="path != 'home'">
+                    <h1 class="title">{{path}}</h1>
+                    <br>
+                    <h4>
+                        {{des}}
+                    </h4>
+                </div>
+                <div v-else>
+                    <h1 class="title">MAsk<kbd data-toggle="modal" data-target="#myModal">ß</kbd></h1>
+                    <br>
+                    <h4>
+                        The Massive Ask
+                    </h4>
+                </div>
 
+            </div>
+        </nav>
+        <div id="sticky-anchor"></div>
+        <div id="sticky" :style="'background-color: '+color+';'">
+            <!-- Nav tabs -->
+            <ol class="nav-tabs">
+                <li v-if="path == 'home'" class="tab" data-target="#FAQ" data-toggle="tab">FAQ</li>
+                <li v-if="path == 'home'" class="tab active" data-target="#home" data-toggle="tab">Home</li>
+                <li v-if="path != 'home'" class="tab"><a href="..">Home</a></li>
+                <li v-if="path != 'home'" class="tab active" data-target="#home" data-toggle="tab">Posts</li>
+                <li v-if="path == 'home'" class="tab" data-target="#rules" data-toggle="tab">Reglas</li>
+                <li class="tab" data-target="#registrar" data-toggle="tab">Registrar</li>
+                <li class="tab" data-target="#entrar" data-toggle="tab">Entrar</li>
+            </ol>
         </div>
-    </nav>
+    </div>
     <script>
         var path = window.location.pathname;
-
         var boarlinks = new Vue({
-            el: '#boarlinks',
+            el: '#header',
             data: {
                 links: [],
                 path: path,
@@ -78,13 +105,39 @@
                     this.$http.post('zoe.asmx/BoardLinks')
                         .then(function (response) {
                             this.links = response.body.d;
-                            if (this.path.length != 1) {
-                                let tmp = response.body.d.filter(x => x.url == path.substring(1))[0];
-                                this.path = tmp.Name;
-                                this.des = tmp.Descripcion;
-                                this.color = tmp.Color;
-                            } else {
-                                this.path = 'home'
+                            switch (path) {
+                                //home
+                                case '/':
+                                    this.path = 'home';
+                                    let colr = (Math.round(Math.random() * 127) + 127).toString(16) + (Math.round(Math.random() * 127) + 127).toString(16) + (Math.round(Math.random() * 127) + 127).toString(16);
+                                    this.color = "#" + colr;
+                                    $('[name=theme-color]').attr('content', '#' + colr);
+                                    break;
+                                //custom board for not exist in db (need [path,des,color])
+                                case '/axl':
+                                    this.path = 'axl';
+                                    this.des = 'axl';
+                                    this.color = 'gray';
+                                    break;
+                                //error page
+                                case '/error':
+                                    this.path = 'Error :V';
+                                    this.des = 'lo que usted buscaba no se encuentra...(almenos que buscara esta pagina)';
+                                    this.color = 'red';
+                                    break;
+                                //board (succes / fail)
+                                default:
+                                    let tmp = response.body.d.filter(x => x.url == path.substring(1))[0];
+                                    if (!tmp) {
+                                        this.path = 'Error :V';
+                                        this.des = 'lo que usted buscaba no se encuentra...(almenos que buscara esta pagina)';
+                                        this.color = 'red';
+                                    } else {
+                                        this.path = tmp.Name;
+                                        this.des = tmp.Descripcion;
+                                        this.color = '#' + tmp.Color;
+                                        $('[name=theme-color]').attr('content', '#' + tmp.Color);
+                                    }
                             }
                         })
                 }
@@ -94,25 +147,40 @@
             }
         })
     </script>
-    <!-- Nav tabs -->
-    <ul class="nav nav-tabs" role="tablist" style="background-color:rebeccapurple;">
-        <li role="presentation"><a href="#FAQ" aria-controls="FQA" role="tab" data-toggle="tab">FAQ</a></li>
-        <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Home</a></li>
-        <li role="presentation"><a href="#rules" aria-controls="rules" role="tab" data-toggle="tab">Reglas</a></li>
-        <li role="presentation" style="margin-right: 0px;" class="navbar-right"><a href="#registrar" aria-controls="registrar" role="tab" data-toggle="tab">Registrar</a></li>
-        <li role="presentation" class="navbar-right"><a href="#entrar" aria-controls="entrar" role="tab" data-toggle="tab">Entrar</a></li>
-    </ul>
-    <!-- Tab panes -->
+    <!-- Content -->
     <div class="tab-content">
-        <div role="tabpanel" class="tab-pane fade in active" id="home">
-            <div id="post" class="col-sm-offset-2 col-sm-8">
+        <div class="tab-pane" id="FAQ">
+            <dl>
+                <dt>¿Qué es MAsk?</dt>
+                <dd>Un (no)sencillo tablón de texto. Donde cada tablon es dedicado a un tema en especifico.</dd>
+                <dt>¿Qué se hace aquí?</dt>
+                <dd>En escencia escibir y leer; escribes lo que piensas sobre un cierto tema, y leer lo que la gente piensa sobre ese mismo tema.</dd>
+                <dt>¿Cómo puedo ayudar?</dt>
+                <dd>
+                    <ul>
+                        <li>Comparte la página, mientras más gente juegue es mas divertido.</li>
+                        <li>En el Tablon <a href="dev">/dev/</a> Comenta bugs que encuentres y/o funciones que pueden servir para MAsk (empezando con funciones fáciles).</li>
+                    </ul>
+                </dd>
+                <dt>¿No existe una App?</dt>
+                <dd>Por ahora que es una Beta no creo que sea necesario, pero puedes crear un acceso directo.</dd>
+                <dd>
+                    <ul>
+                        <li>En Android(Chrome): Opciones>Añadir a pantalla de inicio. (Recomendado)</li>
+                        <li>En Windows(Chrome): Arrastra el icono que esta antes de dirección de la pagina hasta el escritorio.</li>
+                    </ul>
+                </dd>
+            </dl>
+        </div>
+        <div class="tab-pane active" id="home">
+            <div id="post" class="vale-5">
                 <table v-cloak v-for="pst in posts" class="auto-style2" style="border-bottom: 1px solid #ccd6dd;width: 100%">
                     <tbody>
                         <tr>
                             <td class="auto-style3">
                                 <div v-html="pst.User != '---' ? (pst.Mask != 'Anónimo' ? '<a>'+pst.User+'</a> ['+pst.Mask+']' : '<a>'+pst.User+'</a>') : pst.Mask"></div>
                             </td>
-                            <td class="auto-style3" style="text-align:right"><abbr title="pst.Date | fecha">{{pst.Date | now}}</abbr><div v-if="b=='/'"> en <label><a href="pst.BoardLink">{{pst.BoardName}}</a></label></div></td>
+                            <td class="auto-style3" style="text-align:right"><abbr :title="pst.Date | fecha">{{pst.Date | now}}</abbr><div v-if="b=='/'"> en <label><a :href="pst.BoardLink">{{pst.BoardName}}</a></label></div></td>
                         </tr>
                         <tr>
                             <td class="hide"><img src="" alt="Alternate Text"><video controls="controls"><source src="n/a" type="video/mp4"><source src="n/a" type="video/webm"></video></td>
@@ -143,7 +211,7 @@
                     methods: {
                         Posts() {
                             this.$http.post(path.length == 1 ? 'zoe.asmx/Last' : 'zoe.asmx/Posts', {
-                                board: path.length == 1 ? 0 : 'dev'
+                                board: path.length == 1 ? 0 : path.substring(1)
                             })
                                 .then(function (response) {
                                     this.posts = response.body.d;
@@ -167,110 +235,33 @@
                 })
             </script>
         </div>
-        <div role="tabpanel" class="tab-pane fade" id="FAQ">
-            <dl>
-                <dt>¿Qué es MAsk?</dt>
-                <dd>Un (no)sencillo tablón de texto. Donde cada tablon es dedicado a un tema en especifico.</dd>
-                <dt>¿Qué se hace aquí?</dt>
-                <dd>En escencia escibir y leer; escribes lo que piensas sobre un cierto tema, y leer lo que la gente piensa sobre ese mismo tema.</dd>
-                <dt>¿Cómo puedo ayudar?</dt>
-                <dd>
-                    <ul>
-                        <li>Comparte la página, mientras más gente juegue es mas divertido.</li>
-                        <li>En el Tablon <a href="dev">/dev/</a> Comenta bugs que encuentres y/o funciones que pueden servir para MAsk (empezando con funciones fáciles).</li>
-                    </ul>
-                </dd>
-                <dt>¿No existe una App?</dt>
-                <dd>Por ahora que es una Beta no creo que sea necesario, pero puedes crear un acceso directo.</dd>
-                <dd>
-                    <ul>
-                        <li>En Android(Chrome): Opciones>Añadir a pantalla de inicio. (Recomendado)</li>
-                        <li>En Windows(Chrome): Arrastra el icono que esta antes de dirección de la pagina hasta el escritorio.</li>
-                    </ul>
-                </dd>
-            </dl>
-        </div>
-        <div role="tabpanel" class="tab-pane fade" id="rules">
+        <div class="tab-pane" id="rules">
             <ol>
                 <li>Respetar el tema del Post</li>
             </ol>
         </div>
-        <div role="tabpanel" class="tab-pane fade" id="entrar">
-            ...
+        <div class="tab-pane" id="registrar">
+            Al registrarse esta aceptando los terminos y condiciones de MAsk!!!
         </div>
-        <div role="tabpanel" class="tab-pane fade" id="registrar">
-            ...
+        <div class="tab-pane" id="entrar">
+            Bienvenido~
         </div>
     </div>
-    <div class="modal fade versionModal" tabindex="-1" role="dialog" aria-labelledby="gridSystemModalLabel">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="gridSystemModalLabel">MAsk β Version 0.1.4</h4>
-                </div>
-                <div class="modal-body">
-                    <dl>
-                        <dt>0.1.4</dt>
-                        <dd>???</dd>
-                        <dt>0.1.3</dt>
-                        <dd>Cambios Internos de Servidor y Base de Datos, no afecta a los Usuarios.</dd>
-                        <dt>0.1.2</dt>
-                        <dd>Correciones Menores.</dd>
-                        <dt>0.1.1</dt>
-                        <dd>Correciones Menores.</dd>
-                        <dt>0.1.0</dt>
-                        <dd>Comienzo de Beta Abierta.</dd>
-                    </dl>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                </div>
-            </div><!-- /.modal-content -->
-        </div><!-- /.modal-dialog -->
-    </div>
-    <div class="modal fade commentModal" tabindex="-1" role="dialog" aria-labelledby="gridSystemModalLabel">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="postStatus"></h4>
-                </div>
-                <div class="modal-body" style="max-height:80vh;overflow-y:auto" id="comments">
-                </div>
-                <div class="modal-footer" id="posting">
-                    <textarea id="Contenidoo"></textarea>
-                    <br />
-                    <div class="row" id="crearCliente">
-                        <div class="col-xs-9 col-md-10">
-                            <select id="SelectMaskCo" class="form-control">
-                                <option value="0">selecciona Mask</option>
-                            </select>
-                            <!--<script>
-                                $.ajax({
-                                    type: "POST",
-                                    url: '/Home/Mask/',
-                                    data: "{ 'userId':'" + Cookies.get('ID') + "'}",
-                                    content: "json",
-                                    contentType: "application/json",
-                                    error: function (xhr) {
-                                        bootbox.alert('Ha ocurrido algun tipo de error');
-                                    },
-                                    success: function (data) {
-                                        $.each(data, function (key, value) {
-                                            $('<option value="' + value.ID + '">' + value.Name + '</option>').appendTo('#SelectMaskCo');
-                                        });
-                                    }
-                                });
-                            </script>-->
-                        </div>
-                        <div class="col-xs-2 col-md-2">
-                            <button id="comentar" type="button" class="btn btn-default">Post!</button>
-                        </div>
-                    </div>
-                </div>
-            </div><!-- /.modal-content -->
-        </div><!-- /.modal-dialog -->
+    <!-- The Modal -->
+    <div id="myModal" class="modal hide">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close">&times;</span>
+                <h2>Modal Header</h2>
+            </div>
+            <div class="modal-body">
+                <p>Some text in the Modal Body</p>
+                <p>Some other text...</p>
+            </div>
+            <div class="modal-footer">
+                <h3>Modal Footer</h3>
+            </div>
+        </div>
     </div>
 </body>
 </html>

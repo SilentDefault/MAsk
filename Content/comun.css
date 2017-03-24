@@ -17,12 +17,3 @@
 .auto-style5 {
     width: 605px;
 }
-
-#sticky.stick {
-    margin-top: 0 !important;
-    position: fixed;
-    width: 100%;
-    top: 0;
-    z-index: 1;
-    border-radius: 0 0 0.5em 0.5em;
-}

@@ -5,17 +5,19 @@ using System.Web;
 using System.Web.Services;
 using MySql.Data.MySqlClient;
 using System.Web.Script.Serialization;
+using System.Security;
 
 /// <summary>
 /// Descripción breve de zoe
 /// </summary>
-[WebService(Namespace = "http://tempuri.org/")]
+[WebService(Namespace = "http://mask.odacode.com")]
 [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
 // Para permitir que se llame a este servicio web desde un script, usando ASP.NET AJAX, quite la marca de comentario de la línea siguiente.
 [System.Web.Script.Services.ScriptService]
 public class zoe : System.Web.Services.WebService
 {
-    MySqlConnection conn = new MySqlConnection("Server=localhost;Database=mask;Uid=root;pwd=1212;");
+    MySqlConnection conn = new MySqlConnection("Server=localhost;Database=Mask;Uid=root;Pwd=1212;");
+    //MySqlConnection conn = new MySqlConnection("Server=50.62.209.82;Database=Mask;Uid=asecas;Pwd=Visualstudio2017;");
     public zoe()
     {
 
