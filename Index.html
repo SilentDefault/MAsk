@@ -1,7 +1,5 @@
-﻿
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
-
 <head>
     <meta charset="utf-8" lang="es" translate="no" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" charset="utf-8" lang="es" translate="no" />
@@ -24,11 +22,10 @@
     <script src="Scripts/undo.js"></script>
     <script>
         moment.locale('es');
-        $(document).ready(function() {
-            $(function() {
+        $(document).ready(function () {
+            $(function () {
                 $(window).scroll(sticky_relocate);
             });
-
             function sticky_relocate() {
                 var window_top = $(window).scrollTop();
                 var div_top = $('#sticky-anchor').offset().top;
@@ -40,10 +37,8 @@
                     $('#sticky-anchor').height(0);
                 }
             }
-            $('[data-target="#home"]').on('click', function() {
-                $('html,body').animate({
-                    scrollTop: $("#header").offset().top
-                }, 'slow');
+            $('[data-target="#home"]').on('click', function () {
+                $('html,body').animate({ scrollTop: $("#header").offset().top }, 'slow');
             });
         });
     </script>
@@ -111,7 +106,7 @@
             methods: {
                 cargarLinks() {
                     this.$http.post('zoe.asmx/BoardLinks')
-                        .then(function(response) {
+                        .then(function (response) {
                             this.links = response.body.d;
                             switch (path) {
                                 //home
@@ -121,19 +116,19 @@
                                     this.color = "#" + colr;
                                     $('[name=theme-color]').attr('content', '#' + colr);
                                     break;
-                                    //custom board for not exist in db (need [path,des,color])
+                                //custom board for not exist in db (need [path,des,color])
                                 case '/axl':
                                     this.path = 'axl';
                                     this.des = 'axl';
                                     this.color = 'gray';
                                     break;
-                                    //error page
+                                //error page
                                 case '/error':
                                     this.path = 'Error :V';
                                     this.des = 'lo que usted buscaba no se encuentra...(almenos que buscara esta pagina)';
                                     this.color = 'red';
                                     break;
-                                    //board (succes / fail)
+                                //board (succes / fail)
                                 default:
                                     let tmp = response.body.d.filter(x => x.url == path.substring(1))[0];
                                     if (!tmp) {
@@ -150,7 +145,7 @@
                         })
                 }
             },
-            created: function() {
+            created: function () {
                 this.cargarLinks();
             }
         })
@@ -188,9 +183,7 @@
                             <td class="auto-style3">
                                 <div v-html="pst.User != '---' ? (pst.Mask != 'Anónimo' ? '<a>'+pst.User+'</a> ['+pst.Mask+']' : '<a>'+pst.User+'</a>') : pst.Mask"></div>
                             </td>
-                            <td class="auto-style3" style="text-align:right"><abbr :title="pst.Date | fecha">{{pst.Date | now}}</abbr>
-                                <div v-if="b=='/'"> en <label><a :href="pst.BoardLink">{{pst.BoardName}}</a></label></div>
-                            </td>
+                            <td class="auto-style3" style="text-align:right"><abbr :title="pst.Date | fecha">{{pst.Date | now}}</abbr><div v-if="b=='/'"> en <label><a :href="pst.BoardLink">{{pst.BoardName}}</a></label></div></td>
                         </tr>
                         <tr>
                             <td class="hide"><img src="" alt="Alternate Text"><video controls="controls"><source src="n/a" type="video/mp4"><source src="n/a" type="video/webm"></video></td>
@@ -221,25 +214,25 @@
                     methods: {
                         Posts() {
                             this.$http.post(path.length == 1 ? 'zoe.asmx/Last' : 'zoe.asmx/Posts', {
-                                    board: path.length == 1 ? 0 : path.substring(1)
-                                })
-                                .then(function(response) {
+                                board: path.length == 1 ? 0 : path.substring(1)
+                            })
+                                .then(function (response) {
                                     this.posts = response.body.d;
                                 })
-                                .catch(function(error) {
+                                .catch(function (error) {
                                     // TODO : Falta por controlar
                                 })
                         },
                     },
                     filters: {
-                        fecha: (function(data) {
+                        fecha: (function (data) {
                             return moment(data).format('LLLL');
                         }),
-                        now: (function(data) {
+                        now: (function (data) {
                             return moment(data).fromNow();
                         })
                     },
-                    created: function() {
+                    created: function () {
                         this.Posts();
                     }
                 })
@@ -274,5 +267,4 @@
         </div>
     </div>
 </body>
-
 </html>
