@@ -1,4 +1,4 @@
-﻿/* http://meyerweb.com/eric/tools/css/reset/ 
+﻿/* http://meyerweb.com/eric/tools/css/reset/
    v2.0 | 20110126
    License: none (public domain)
 */
@@ -133,6 +133,33 @@ kbd {
 ol > li {
     display: inline-block;
 }
+
+.nav {
+    display: -webkit-flex;
+    display: -ms-flex;
+    display: flex;
+    justify-content: space-around;
+}
+
+.nav ol {
+    width: 50%;
+    background-color: rebeccapurple;
+}
+
+.nav ol:nth-child(1) {
+    display: -webkit-flex;
+    display: -ms-flex;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.nav ol:nth-child(2) {
+    display: -webkit-flex;
+    display: -ms-flex;
+    display: flex;
+    justify-content: flex-end;
+}
+
 .nav-tabs{
     margin-top:5px;
 }
