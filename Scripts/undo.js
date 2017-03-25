@@ -6,9 +6,9 @@ $(document).ready(function () {
     //para que funcione los tabs
     $('[data-toggle=tab]').click(function (event) {
         let tab = $(this);
-        let tabParent = tab.parent()[0];
-        for (var i = tabParent.children.length - 1; i >= 0; i--) {
-            tabParent.children[i].className = 'tab';
+        var xx = $('.nav-tabs').children();
+        for (var y = 0; y < xx.length - 1; y++) {
+            xx[y].className = 'tab';
         }
         tab[0].className = 'tab active';
 

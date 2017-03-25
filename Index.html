@@ -1,4 +1,4 @@
-
+﻿
 <!DOCTYPE html>
 <html>
 
@@ -82,18 +82,20 @@
         </nav>
         <div id="sticky-anchor"></div>
         <div id="sticky" :style="'background-color: '+color+';'">
-            <!-- Nav tabs -->
-            <ol class="nav-tabs">
-                <li v-if="path == 'home'" class="tab" data-target="#FAQ" data-toggle="tab">FAQ</li>
-                <li v-if="path == 'home'" class="tab active" data-target="#home" data-toggle="tab">Home</li>
-                <li v-if="path != 'home'" class="tab"><a href="..">Home</a></li>
-                <li v-if="path != 'home'" class="tab active" data-target="#home" data-toggle="tab">Posts</li>
-                <li v-if="path == 'home'" class="tab" data-target="#rules" data-toggle="tab">Reglas</li>
-            </ol>
-            <ol>
-                <li class="tab" data-target="#registrar" data-toggle="tab">Registrar</li>
-                <li class="tab" data-target="#entrar" data-toggle="tab">Entrar</li>
-            </ol>
+            <nav class="nav">
+                <!-- Nav tabs -->
+                <ol class="nav-tabs">
+                    <li v-if="path == 'home'" class="tab" data-target="#FAQ" data-toggle="tab">FAQ</li>
+                    <li v-if="path == 'home'" class="tab active" data-target="#home" data-toggle="tab">Home</li>
+                    <li v-if="path != 'home'" class="tab"><a href="..">Home</a></li>
+                    <li v-if="path != 'home'" class="tab active" data-target="#home" data-toggle="tab">Posts</li>
+                    <li v-if="path == 'home'" class="tab" data-target="#rules" data-toggle="tab">Reglas</li>
+                </ol>
+                <ol class="nav-tabs">
+                    <li class="tab" data-target="#registrar" data-toggle="tab">Registrar</li>
+                    <li class="tab" data-target="#entrar" data-toggle="tab">Entrar</li>
+                </ol>
+            </nav>
         </div>
     </div>
     <script>
