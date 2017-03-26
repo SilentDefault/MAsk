@@ -7,7 +7,7 @@ $(document).ready(function () {
     $('[data-toggle=tab]').click(function (event) {
         let tab = $(this);
         var xx = $('.nav-tabs').children();
-        for (var y = 0; y < xx.length - 1; y++) {
+        for (var y = 0; y < xx.length; y++) {
             xx[y].className = 'tab';
         }
         tab[0].className = 'tab active';

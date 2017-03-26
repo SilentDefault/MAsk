@@ -15,12 +15,25 @@
     <script src="Scripts/less.min.js"></script>
     <link href="Content/comun.css" rel="stylesheet" />
     <script src="Scripts/jquery-3.1.1.min.js"></script>
+    <script src="Scripts/undo.js"></script>
     <script src="Scripts/moment-with-locales.min.js"></script>
     <script src="Scripts/vue.js"></script>
     <script src="Scripts/vue-resourse.js"></script>
     <script src="Scripts/comentar.js"></script>
-    <script src="Scripts/undo.js"></script>
     <script>
+        var path = window.location.pathname;
+        function push(url) {
+            history.pushState(null, null, url);
+            reloadBoard();
+        }
+        window.onpopstate = function (event) {
+            reloadBoard();
+        }
+        function reloadBoard() {
+            path = window.location.pathname;
+            boarlinks.cargarLinks();
+            post.Posts();
+        }
         moment.locale('es');
         $(document).ready(function () {
             $(function () {
@@ -54,8 +67,8 @@
     <div id="header" :style="'background-color: '+color+';'">
         <nav style="margin-bottom: 0px; border-radius: 0px;">
             <ol class="breadcrumb" style="white-space:nowrap;overflow-x:auto;">
-                <li><a href=".." style="color:black">Home</a></li>
-                <li v-cloak v-for="link in links" class="redpo"><a :href="link.url" :style="'color: #'+link.Color+';'">{{link.Name}}</a></li>
+                <li><a onclick="push('/');" style="color:black">Home</a></li>
+                <li v-cloak v-for="link in links" class="redpo"><a :onclick="'push(\''+link.url+'\');'" :style="'color: #'+link.Color+';'">{{link.Name}}</a></li>
             </ol>
             <div style="text-align: center;">
                 <div v-if="path != 'home'">
@@ -82,7 +95,7 @@
                 <ol class="nav-tabs">
                     <li v-if="path == 'home'" class="tab" data-target="#FAQ" data-toggle="tab">FAQ</li>
                     <li v-if="path == 'home'" class="tab active" data-target="#home" data-toggle="tab">Home</li>
-                    <li v-if="path != 'home'" class="tab"><a href="..">Home</a></li>
+                    <li v-if="path != 'home'" class="tab"><a onclick="push('/');">Home</a></li>
                     <li v-if="path != 'home'" class="tab active" data-target="#home" data-toggle="tab">Posts</li>
                     <li v-if="path == 'home'" class="tab" data-target="#rules" data-toggle="tab">Reglas</li>
                 </ol>
@@ -94,7 +107,6 @@
         </div>
     </div>
     <script>
-        var path = window.location.pathname;
         var boarlinks = new Vue({
             el: '#header',
             data: {
@@ -183,7 +195,7 @@
                             <td class="auto-style3">
                                 <div v-html="pst.User != '---' ? (pst.Mask != 'Anónimo' ? '<a>'+pst.User+'</a> ['+pst.Mask+']' : '<a>'+pst.User+'</a>') : pst.Mask"></div>
                             </td>
-                            <td class="auto-style3" style="text-align:right"><abbr :title="pst.Date | fecha">{{pst.Date | now}}</abbr><div v-if="b=='/'"> en <label><a :href="pst.BoardLink">{{pst.BoardName}}</a></label></div></td>
+                            <td class="auto-style3" style="text-align:right"><abbr :title="pst.Date | fecha">{{pst.Date | now}}</abbr><div v-if="b=='/'"> en <label><a :onclick="'push(\''+pst.BoardLink+'\');'">{{pst.BoardName}}</a></label></div></td>
                         </tr>
                         <tr>
                             <td class="hide"><img src="" alt="Alternate Text"><video controls="controls"><source src="n/a" type="video/mp4"><source src="n/a" type="video/webm"></video></td>
@@ -218,6 +230,7 @@
                             })
                                 .then(function (response) {
                                     this.posts = response.body.d;
+                                    this.b = path;
                                 })
                                 .catch(function (error) {
                                     // TODO : Falta por controlar
