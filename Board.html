@@ -28,14 +28,14 @@
     <div id="header" :style="'background-color: '+color+';'">
         <nav style="margin-bottom: 0px; border-radius: 0px;">
             <ol class="breadcrumb" style="white-space:nowrap;overflow-x:auto;">
-                <li><a onclick="reload('/');" style="color:black">Home</a></li>
-                <li v-cloak v-for="link in links" class="redpo"><a :href="link.url" :style="'color: #'+link.Color+';'">{{link.Name}}</a></li>
+                <li><a href="/" style="color:black">Home</a></li>
+                <li v-cloak v-for="link in links" class="redpo"><a :onclick="'reload(\''+link.url+'\');'" :style="'color: #'+link.Color+';'">{{link.Name}}</a></li>
             </ol>
             <div style="text-align: center;">
-                <h1 class="title">MAsk<kbd data-toggle="modal" data-target="#myModal">ß</kbd></h1>
+                <h1 class="title">{{path}}</h1>
                 <br>
                 <h4>
-                    The Massive Ask
+                    {{des}}
                 </h4>
             </div>
         </nav>
@@ -44,9 +44,8 @@
             <nav class="nav">
                 <!-- Nav tabs -->
                 <ol class="nav-tabs">
-                    <li class="tab" data-target="#FAQ" data-toggle="tab">FAQ</li>
-                    <li class="tab active" data-target="#home" data-toggle="tab">Home</li>
-                    <li class="tab" data-target="#rules" data-toggle="tab">Reglas</li>
+                    <li class="tab"><a href="/">Home</a></li>
+                    <li class="tab active" data-target="#home" data-toggle="tab">Posts</li>
                 </ol>
                 <ol class="nav-tabs">
                     <li class="tab" data-target="#registrar" data-toggle="tab">Registrar</li>
@@ -69,10 +68,18 @@
                     this.$http.post('zoe.asmx/BoardLinks')
                         .then(function (response) {
                             this.links = response.body.d;
-                            this.path = 'home';
-                            let colr = (Math.round(Math.random() * 127) + 127).toString(16) + (Math.round(Math.random() * 127) + 127).toString(16) + (Math.round(Math.random() * 127) + 127).toString(16);
-                            this.color = "#" + colr;
-                            $('[name=theme-color]').attr('content', '#' + colr);
+
+                            let tmp = response.body.d.filter(x => x.url == path.substring(1))[0];
+                            if (!tmp) {
+                                this.path = 'Error :V';
+                                this.des = 'lo que usted buscaba no se encuentra...(almenos que buscara esta pagina)';
+                                this.color = 'red';
+                            } else {
+                                this.path = tmp.Name;
+                                this.des = tmp.Descripcion;
+                                this.color = '#' + tmp.Color;
+                                $('[name=theme-color]').attr('content', '#' + tmp.Color);
+                            }
                         });
                 }
             },
@@ -83,29 +90,6 @@
     </script>
     <!-- Content -->
     <div class="tab-content">
-        <div class="tab-pane" id="FAQ">
-            <dl>
-                <dt>¿Qué es MAsk?</dt>
-                <dd>Un (no)sencillo tablón de texto. Donde cada tablon es dedicado a un tema en especifico.</dd>
-                <dt>¿Qué se hace aquí?</dt>
-                <dd>En escencia escibir y leer; escribes lo que piensas sobre un cierto tema, y leer lo que la gente piensa sobre ese mismo tema.</dd>
-                <dt>¿Cómo puedo ayudar?</dt>
-                <dd>
-                    <ul>
-                        <li>Comparte la página, mientras más gente juegue es mas divertido.</li>
-                        <li>En el Tablon <a href="dev">/dev/</a> Comenta bugs que encuentres y/o funciones que pueden servir para MAsk (empezando con funciones fáciles).</li>
-                    </ul>
-                </dd>
-                <dt>¿No existe una App?</dt>
-                <dd>Por ahora que es una Beta no creo que sea necesario, pero puedes crear un acceso directo.</dd>
-                <dd>
-                    <ul>
-                        <li>En Android(Chrome): Opciones>Añadir a pantalla de inicio. (Recomendado)</li>
-                        <li>En Windows(Chrome): Arrastra el icono que esta antes de dirección de la pagina hasta el escritorio.</li>
-                    </ul>
-                </dd>
-            </dl>
-        </div>
         <div class="tab-pane active" id="home">
             <div id="post" class="vale-5">
                 <table v-cloak v-for="pst in posts" class="auto-style2" style="border-bottom: 1px solid #ccd6dd;width: 100%">
@@ -114,7 +98,7 @@
                             <td class="auto-style3">
                                 <div v-html="pst.User != '---' ? (pst.Mask != 'Anónimo' ? '<a>'+pst.User+'</a> ['+pst.Mask+']' : '<a>'+pst.User+'</a>') : pst.Mask"></div>
                             </td>
-                            <td class="auto-style3" style="text-align:right"><abbr :title="pst.Date | fecha">{{pst.Date | now}}</abbr> en <label><a :href="pst.BoardLink">{{pst.BoardName}}</a></label></td>
+                            <td class="auto-style3" style="text-align:right"><abbr :title="pst.Date | fecha">{{pst.Date | now}}</abbr></td>
                         </tr>
                         <tr>
                             <td class="hide"><img src="" alt="Alternate Text"><video controls="controls"><source src="n/a" type="video/mp4"><source src="n/a" type="video/webm"></video></td>
@@ -145,8 +129,8 @@
                     },
                     methods: {
                         Posts() {
-                            this.$http.post('zoe.asmx/Last', {
-                                board: 1
+                            this.$http.post(path.length == 1 ? 'zoe.asmx/Last' : 'zoe.asmx/Posts', {
+                                board: path.length == 1 ? 0 : path.substring(1)
                             })
                                 .then(function (response) {
                                     this.posts = response.body.d;
@@ -165,8 +149,8 @@
                         now: (function (data) {
                             return moment(data).fromNow();
                         }),
-                        pstColor: (function (data) {
-                            return '#' + boarlinks.links.find(x => x.url == data).Color;
+                        postColor: (function (data) {
+                            return boarlinks.links.find(x => x.url == data).Color;
                         })
                     },
                     created: function () {
@@ -174,11 +158,6 @@
                     }
                 })
             </script>
-        </div>
-        <div class="tab-pane" id="rules">
-            <ol>
-                <li>Respetar el tema del Post</li>
-            </ol>
         </div>
         <div class="tab-pane" id="registrar">
             Al registrarse esta aceptando los terminos y condiciones de MAsk!!!

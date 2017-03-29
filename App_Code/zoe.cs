@@ -129,4 +129,14 @@ public class zoe : System.Web.Services.WebService
         conn.Close();
         return lista;
     }
+    [WebMethod]
+    public int CheckUser(string user)
+    {
+        string sql = "SELECT id FROM users WHERE Nick = '"+user+"'";
+        MySqlCommand cmd = new MySqlCommand(sql, conn);
+        conn.Open();
+        int r = cmd.ExecuteNonQuery();
+        conn.Close();
+        return r;
+    }
 }

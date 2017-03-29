@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿<!-- index original antes de dividirlo -->
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" lang="es" translate="no" />
@@ -20,7 +21,59 @@
     <script src="Scripts/vue-resourse.js"></script>
     <script src="Scripts/comentar.js"></script>
     <script src="Scripts/js.cookie-2.1.3.min.js"></script>
-    <script src="Scripts/undo.js"></script>
+    <script>
+        var path = window.location.pathname;
+        function push(url) {
+            let tabs = $('.tab');
+            for (var y = 0; y < tabs.length; y++) {
+                tabs[y].className = 'tab';
+            }
+            $('[data-target="#home"]')[0].className = 'tab active';
+
+
+            let pane = $('#home');
+            let paneParent = pane.parent()[0];
+            for (var i = paneParent.children.length - 1; i >= 0; i--) {
+                paneParent.children[i].className = 'tab-pane';
+            }
+            pane[0].className = 'tab-pane active';
+            history.pushState(null, null, url);
+            reloadBoard();
+        }
+        window.onpopstate = function (event) {
+            reloadBoard();
+        }
+        function reloadBoard() {
+            path = window.location.pathname;
+            boarlinks.cargarLinks();
+            post.Posts();
+        }
+        moment.locale('es');
+        $(document).ready(function () {
+            $(function () {
+                $(window).scroll(sticky_relocate);
+            });
+            function sticky_relocate() {
+                var window_top = $(window).scrollTop();
+                var div_top = $('#sticky-anchor').offset().top;
+                if (window_top > div_top) {
+                    $('#sticky').addClass('stick');
+                    $('#sticky-anchor').height($('#sticky').outerHeight());
+                } else {
+                    $('#sticky').removeClass('stick');
+                    $('#sticky-anchor').height(0);
+                }
+            }
+            $('[data-target="#home"]').on('click', function () {
+                $('html,body').animate({ scrollTop: $("#header").offset().top }, 'slow');
+            });
+        });
+    </script>
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+    </style>
 </head>
 
 <body>
@@ -28,25 +81,39 @@
     <div id="header" :style="'background-color: '+color+';'">
         <nav style="margin-bottom: 0px; border-radius: 0px;">
             <ol class="breadcrumb" style="white-space:nowrap;overflow-x:auto;">
-                <li><a onclick="reload('/');" style="color:black">Home</a></li>
-                <li v-cloak v-for="link in links" class="redpo"><a :href="link.url" :style="'color: #'+link.Color+';'">{{link.Name}}</a></li>
+                <li><a onclick="push('/');" style="color:black">Home</a></li>
+                <li v-cloak v-for="link in links" class="redpo"><a :onclick="'push(\''+link.url+'\');'" :style="'color: #'+link.Color+';'">{{link.Name}}</a></li>
             </ol>
             <div style="text-align: center;">
-                <h1 class="title">MAsk<kbd data-toggle="modal" data-target="#myModal">ß</kbd></h1>
-                <br>
-                <h4>
-                    The Massive Ask
-                </h4>
+                <div v-if="path != 'home'">
+                    <h1 class="title">{{path}}</h1>
+                    <br>
+                    <h4>
+                        {{des}}
+                    </h4>
+                </div>
+                <div v-else>
+                    <h1 class="title">MAsk<kbd data-toggle="modal" data-target="#myModal">ß</kbd></h1>
+                    <br>
+                    <h4>
+                        The Massive Ask
+                    </h4>
+                </div>
+
             </div>
         </nav>
         <div id="sticky-anchor"></div>
         <div id="sticky" :style="'background-color: '+color+';'">
             <nav class="nav">
                 <!-- Nav tabs -->
-                <ol class="nav-tabs">
+                <ol class="nav-tabs" v-if="path == 'home'">
                     <li class="tab" data-target="#FAQ" data-toggle="tab">FAQ</li>
                     <li class="tab active" data-target="#home" data-toggle="tab">Home</li>
                     <li class="tab" data-target="#rules" data-toggle="tab">Reglas</li>
+                </ol>
+                <ol class="nav-tabs" v-else>
+                    <li class="tab" onclick="push('/');">Home</li>
+                    <li class="tab active" data-target="#home" data-toggle="tab">Posts</li>
                 </ol>
                 <ol class="nav-tabs">
                     <li class="tab" data-target="#registrar" data-toggle="tab">Registrar</li>
@@ -69,10 +136,51 @@
                     this.$http.post('zoe.asmx/BoardLinks')
                         .then(function (response) {
                             this.links = response.body.d;
-                            this.path = 'home';
-                            let colr = (Math.round(Math.random() * 127) + 127).toString(16) + (Math.round(Math.random() * 127) + 127).toString(16) + (Math.round(Math.random() * 127) + 127).toString(16);
-                            this.color = "#" + colr;
-                            $('[name=theme-color]').attr('content', '#' + colr);
+                            switch (path) {
+                                //user (if contains '@')
+                                case (path.match('@') || {}).input:
+                                    //poner aqui metodo para checar si el usuario existe
+                                    this.$http.post('zoe.asmx/CheckUser', { user: path.substring(2) })
+                                        .then(function (response) {
+                                            console.log(response.body.d);
+                                        })
+                                    this.path = path.substring(2);
+                                    this.des = 'user profile';
+                                    this.color = 'blue';
+                                    break;
+                                //home
+                                case '/':
+                                    this.path = 'home';
+                                    let colr = (Math.round(Math.random() * 127) + 127).toString(16) + (Math.round(Math.random() * 127) + 127).toString(16) + (Math.round(Math.random() * 127) + 127).toString(16);
+                                    this.color = "#" + colr;
+                                    $('[name=theme-color]').attr('content', '#' + colr);
+                                    break;
+                                //custom board for not exist in db (need [path,des,color])
+                                case '/axl':
+                                    this.path = 'axl';
+                                    this.des = 'axl';
+                                    this.color = 'gray';
+                                    break;
+                                //error page
+                                case '/error':
+                                    this.path = 'Error :V';
+                                    this.des = 'lo que usted buscaba no se encuentra...(almenos que buscara esta pagina)';
+                                    this.color = 'red';
+                                    break;
+                                //board (succes / fail)
+                                default:
+                                    let tmp = response.body.d.filter(x => x.url == path.substring(1))[0];
+                                    if (!tmp) {
+                                        this.path = 'Error :V';
+                                        this.des = 'lo que usted buscaba no se encuentra...(almenos que buscara esta pagina)';
+                                        this.color = 'red';
+                                    } else {
+                                        this.path = tmp.Name;
+                                        this.des = tmp.Descripcion;
+                                        this.color = '#' + tmp.Color;
+                                        $('[name=theme-color]').attr('content', '#' + tmp.Color);
+                                    }
+                            }
                         });
                 }
             },
@@ -114,7 +222,7 @@
                             <td class="auto-style3">
                                 <div v-html="pst.User != '---' ? (pst.Mask != 'Anónimo' ? '<a>'+pst.User+'</a> ['+pst.Mask+']' : '<a>'+pst.User+'</a>') : pst.Mask"></div>
                             </td>
-                            <td class="auto-style3" style="text-align:right"><abbr :title="pst.Date | fecha">{{pst.Date | now}}</abbr> en <label><a :href="pst.BoardLink">{{pst.BoardName}}</a></label></td>
+                            <td class="auto-style3" style="text-align:right"><abbr :title="pst.Date | fecha">{{pst.Date | now}}</abbr><div v-if="b=='/'"> en <label><a :onclick="'push(\''+pst.BoardLink+'\');'">{{pst.BoardName}}</a></label></div></td>
                         </tr>
                         <tr>
                             <td class="hide"><img src="" alt="Alternate Text"><video controls="controls"><source src="n/a" type="video/mp4"><source src="n/a" type="video/webm"></video></td>
@@ -122,7 +230,7 @@
                         <tr>
                             <td colspan="2">
                                 <p style="text-align: center;">
-                                    <blockquote :style="'border-left-color: '+ color +';'">
+                                    <blockquote>
                                         <div v-html="pst.Content"></div>
                                     </blockquote>
                                 </p>
@@ -140,18 +248,16 @@
                     el: '#post',
                     data: {
                         b: path,
-                        posts: [],
-                        color: ''
+                        posts: []
                     },
                     methods: {
                         Posts() {
-                            this.$http.post('zoe.asmx/Last', {
-                                board: 1
+                            this.$http.post(path.length == 1 ? 'zoe.asmx/Last' : 'zoe.asmx/Posts', {
+                                board: path.length == 1 ? 0 : path.substring(1)
                             })
                                 .then(function (response) {
                                     this.posts = response.body.d;
                                     this.b = path;
-                                    this.color = boarlinks.color;
                                 })
                                 .catch(function (error) {
                                     // TODO : Falta por controlar
@@ -164,9 +270,6 @@
                         }),
                         now: (function (data) {
                             return moment(data).fromNow();
-                        }),
-                        pstColor: (function (data) {
-                            return '#' + boarlinks.links.find(x => x.url == data).Color;
                         })
                     },
                     created: function () {
